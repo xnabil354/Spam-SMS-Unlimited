@@ -8,17 +8,6 @@
 <a href="https://github.com/xnabil354"><img title="Author" src="https://img.shields.io/badge/Author-x nabil354-red.svg?style=for-the-badge&logo=github"></a>
 </p>
 
-### Install In TERMUX
-
-```bash
-- apt update && apt upgrade -y
-- pkg install python3 git python3-pip rust -y
-- git clone https://github.com/xnabil354/SpamOTP-Unlimited
-- cd SpamOTP-Unlimited
-- pip3 install -r requirements.txt
-- python3 main.py
-```
-
 ### Install In Linux With Root
 
 ```bash
@@ -27,7 +16,8 @@
 - git clone https://github.com/xnabil354/SpamOTP-Unlimited
 - cd SpamOTP-Unlimited
 - pip3 install -r requirements.txt
-- python3 main.py
+- pm2 start spam.py --name=variable --interpreter=python3 --restart-delay=timedelay (ex : 30000ms) target number (ex : +628xxxx) count (ex: 10) (form spam sms target )
+- pm2 start spamUnlimited.py --name=variable --interpreter=python3 --restart-delay=timedelay (ex : 30000ms) target number (ex : +628xxxx) (form spam sms unlimited )
 ```
 
 ### Run This Tool With Multiple Process
@@ -36,7 +26,9 @@
 - sudo apt install nodejs -y
 - npm install -g npm@latest
 - npm i -g pm2
-- pm2 start main.py --name=variable --interpreter=python3 --restart-delay=timedelay (ex : 30000ms) target number (ex : 08xxxxx)
+- pip3 install -r requirements.txt
+- pm2 start spam.py --name=variable --interpreter=python3 --restart-delay=timedelay (ex : 30000ms) target number (ex : +628xxxx) count (ex: 10) (form spam sms target )
+- pm2 start spamUnlimited.py --name=variable --interpreter=python3 --restart-delay=timedelay (ex : 30000ms) target number (ex : +628xxxx) (form spam sms unlimited )
 
 ```
 
@@ -57,3 +49,4 @@ Web Devloper & Pentester.
 |![index](https://i.top4top.io/p_2635li2tw1.jpeg)|
 |![index](https://j.top4top.io/p_2635uk94u1.jpeg)|
 # spam-otp-unlimited
+# Spam-SMS-Unlimited
