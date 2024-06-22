@@ -1,7 +1,0 @@
-[
-  {
-    "data": {
-      "resendOTP": { "success": true, "__typename": "AuthBooleanResponseType" }
-    }
-  }
-]
