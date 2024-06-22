@@ -77,10 +77,6 @@ data_danacita = json.dumps({
     "username": inputNomer,
 })
 
-data_resendotp = json.dumps({
-    "mobile_phone": inputNomer,
-})
-
 print(f"{W}[{hijau}• SPAM SMS UNLIMITED{kuning}•{hijau}•{W}]")
 while True:
     headers_danacita = generate_headers()
