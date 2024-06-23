@@ -16,8 +16,8 @@
 - git clone https://github.com/xnabil354/SpamOTP-Unlimited
 - cd SpamOTP-Unlimited
 - pip3 install -r requirements.txt
-- pm2 start spam.py --name=variable --interpreter=python3 --restart-delay=timedelay (ex : 30000ms) target number (ex : +628xxxx) count (ex: 10) (form spam sms target )
-- pm2 start spamUnlimited.py --name=variable --interpreter=python3 --restart-delay=timedelay (ex : 30000ms) target number (ex : +628xxxx) (form spam sms unlimited )
+- pm2 start spamSingle.py --name=variable --interpreter=python3 --restart-delay=timedelay (ex : 30000ms) target number (ex : +628xxxx) (Spam OTP SMS Single Provider)
+- pm2 start spamMulti.py --name=variable --interpreter=python3 --restart-delay=timedelay (ex : 30000ms) target number (ex : +628xxxx) (Spam OTP SMS & Whatsapp Multi Provider)
 ```
 
 ### Run This Tool With Multiple Process
