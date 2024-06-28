@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Send OTP SMS</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        .loading-popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 20px;
+            border-radius: 5px;
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Send OTP SMS</h1>
+        <form id="otpForm" method="POST" onsubmit="showLoadingPopup()">
+            <label for="phone_number">Phone Number (ex: +628xxx):</label>
+            <input type="text" id="phone_number" name="phone_number" required>
+            <label for="otp_count">Jumlah Spam :</label>
+            <input type="number" id="otp_count" name="otp_count" required>
+            <button id="submitBtn" type="submit">Spam OTP</button>
+        </form>
+        <div class="loading-popup" id="loadingPopup">
+            Spamming OTP, please wait...
+        </div>
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <ul>
+                {% for message in messages %}
+                    <li>{{ message }}</li>
+                {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <script>
+        function showLoadingPopup() {
+            document.getElementById('loadingPopup').style.display = 'block';
+            document.getElementById('submitBtn').style.display = 'none';  // Hide the submit button
+            return true;  // Continue with form submission
+        }
+    </script>
+</body>
+</html>
